@@ -12,7 +12,9 @@ data class PlayerResultDto(
 )
 
 data class StatsDetailDto(
-    @SerializedName("TotalKills") val kills: Int,
-    @SerializedName("TotalDeaths") val deaths: Int,
-    @SerializedName("SpartanRank") val rank: Int
+    @SerializedName("TotalKills") val kills: Int?,
+    @SerializedName("TotalDeaths") val deaths: Int?,
+    @SerializedName("SpartanRank") val rank: Int?,
+    @SerializedName("TotalGamesWon") val wins: Int?,    // New
+    @SerializedName("TotalGamesLost") val losses: Int?  // New
 )

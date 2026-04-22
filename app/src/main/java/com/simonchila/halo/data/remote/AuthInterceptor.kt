@@ -8,6 +8,7 @@ class AuthInterceptor(private val apiKey: String) : Interceptor {
         val request = chain.request().newBuilder()
             .addHeader("Ocp-Apim-Subscription-Key", apiKey)
             .build()
+
         return chain.proceed(request)
     }
 }

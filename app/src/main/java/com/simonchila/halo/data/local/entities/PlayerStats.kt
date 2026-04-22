@@ -8,5 +8,7 @@ data class PlayerStats(
     @PrimaryKey val gamerTag: String,
     val rank: String,
     val kills: Int,
-    val deaths: Int
+    val deaths: Int,
+    val wins: Int,   // New
+    val losses: Int  // New
 )

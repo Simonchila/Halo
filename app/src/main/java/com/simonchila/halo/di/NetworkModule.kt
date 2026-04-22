@@ -1,5 +1,7 @@
 package com.simonchila.halo.di
 
+import android.R.attr.apiKey
+import com.simonchila.halo.BuildConfig
 import com.simonchila.halo.data.remote.AuthInterceptor
 import com.simonchila.halo.data.remote.api.HaloApiService
 import okhttp3.OkHttpClient
@@ -7,18 +9,20 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "https://www.haloapi.com/"
 
-    fun createService(apiKey: String): HaloApiService {
+    private const val BASE_URL = "https://www.haloapi.com/"
+    fun createService(): HaloApiService {
+
         val client = OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(apiKey))
+            .addInterceptor(AuthInterceptor(BuildConfig.API_KEY))
             .build()
 
-        return Retrofit.Builder()
+        val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
-            .create(HaloApiService::class.java)
+
+        return retrofit.create(HaloApiService::class.java)
     }
 }

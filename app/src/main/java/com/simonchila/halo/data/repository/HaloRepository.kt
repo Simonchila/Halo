@@ -1,5 +1,6 @@
 package com.simonchila.halo.data.repository
 
+import android.R.attr.tag
 import android.util.Log
 import com.simonchila.halo.data.local.dao.HaloDao
 import com.simonchila.halo.data.local.entities.PlayerStats
@@ -20,6 +21,7 @@ class HaloRepository(
         withContext(Dispatchers.IO) {
             try {
                 val response = apiService.getStats(gamerTag)
+                Log.d("API", response.toString())
                 if (response.isSuccessful) {
                     val dto = response.body()
                     // Convert DTOs to Entities and save to Room

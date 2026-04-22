@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.simonchila.halo.data.local.dao.HaloDao
 import com.simonchila.halo.data.local.entities.PlayerStats
 
-@Database(entities = [PlayerStats::class], version = 1)
+@Database(entities = [PlayerStats::class], version = 2, exportSchema = false)
 abstract class HaloDatabase : RoomDatabase() {
     abstract fun haloDao(): HaloDao
 
@@ -21,7 +21,9 @@ abstract class HaloDatabase : RoomDatabase() {
                     context.applicationContext,
                     HaloDatabase::class.java,
                     "halo_db"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }
