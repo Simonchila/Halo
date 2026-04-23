@@ -1,100 +1,118 @@
 package com.simonchila.halo.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButtonDefaults.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.simonchila.halo.data.local.entities.PlayerStats
-import com.simonchila.halo.ui.screens.components.StatLabel
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import com.simonchila.halo.ui.screens.components.TacticalBox
+import com.simonchila.halo.ui.theme.UnscBlueDark
+import com.simonchila.halo.ui.theme.UnscCyan
+import com.simonchila.halo.ui.theme.UnscTextGray
+import com.simonchila.halo.ui.theme.unscGridBackground
 
 @Composable
 fun PlayerDetailScreen(stats: PlayerStats, onBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .unscGridBackground()
+            .background(UnscBlueDark)
+            .padding(16.dp)
     ) {
-        // Back Button
+        // Back Button with Tactical Styling
         IconButton(onClick = onBack) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back"
-            )
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = UnscCyan)
         }
 
-        // 🔹 Header Section
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(110.dp)
-                    .border(2.dp, Color(0xFF00E5FF), CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stats.rank.replace("Level ", ""), // Cleaner look
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(text = stats.gamerTag, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
-            Text(text = "Player Overview", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
-        }
+        Text(
+            text = "MISSION TELEMETRY: ${stats.gamerTag.uppercase()}",
+            style = MaterialTheme.typography.headlineMedium,
+            color = UnscCyan,
+            fontWeight = FontWeight.Black,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
 
-        // 🔹 Highlight Card
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF111827)),
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        // Combat Stats Row
+        TacticalBox(modifier = Modifier.fillMaxWidth()) {
             Row(
-                modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                StatLabel("Rank", stats.rank)
-                StatLabel("Kills", stats.kills.toString())
-                StatLabel("Deaths", stats.deaths.toString())
+                Column {
+                    Text("TEAM BLUE", color = UnscCyan, fontSize = 12.sp)
+                    Text("50", color = UnscCyan, fontSize = 48.sp, fontWeight = FontWeight.Bold)
+                }
+                Text("VS", color = UnscTextGray, fontWeight = FontWeight.Bold)
+                Column(horizontalAlignment = Alignment.End) {
+                    Text("TEAM RED", color = Color(0xFFFF5252), fontSize = 12.sp)
+                    Text("32", color = Color(0xFFFF5252), fontSize = 48.sp, fontWeight = FontWeight.Bold)
+                }
             }
         }
 
-        // 🔹 Secondary Stats
-        Row(Modifier.fillMaxWidth()) {
-            StatInfoBox("Wins", stats.wins.toString(), Modifier.weight(1f))
-            Spacer(modifier = Modifier.width(12.dp))
-            StatInfoBox("Losses", stats.losses.toString(), Modifier.weight(1f))
+        Spacer(Modifier.height(16.dp))
+
+        // Large Detail Grid
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.weight(1f)
+        ) {
+            item { TacticalDetailItem("TOTAL KILLS", stats.kills.toString(), "[001]") }
+            item { TacticalDetailItem("TOTAL DEATHS", stats.deaths.toString(), "[002]") }
+            item { TacticalDetailItem("GAMES WON", stats.wins.toString(), "[003]") }
+            item { TacticalDetailItem("GAMES LOST", stats.losses.toString(), "[004]") }
+        }
+
+        // Bottom Warning / Status Bar
+        Surface(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            color = Color(0xFF421515),
+            border = BorderStroke(1.dp, Color.Red)
+        ) {
+            Text(
+                "⚠️ SHIELD FAILURE: 12 DETECTED // SECTOR 7 CLEAR",
+                color = Color.Red,
+                fontSize = 10.sp,
+                modifier = Modifier.padding(8.dp),
+                fontFamily = FontFamily.Monospace
+            )
         }
     }
 }
 
 @Composable
-fun StatInfoBox(title: String, value: String, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier.height(80.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1F2937))
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(12.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(value, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-            Text(title, color = Color.Gray, style = MaterialTheme.typography.bodySmall)
-        }
+fun TacticalDetailItem(label: String, value: String, code: String) {
+    TacticalBox(modifier = Modifier.fillMaxWidth()) {
+        Text(code, color = UnscCyan, fontSize = 8.sp)
+        Text(label, color = UnscTextGray, fontSize = 10.sp)
+        Text(value, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
     }
 }
