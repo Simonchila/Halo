@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import coil.ImageLoader // Add this import
 import com.simonchila.halo.ui.screens.HaloDashboard
 import com.simonchila.halo.ui.screens.IntelScreen
 import com.simonchila.halo.ui.screens.PlayerDetailScreen
@@ -26,15 +27,20 @@ import com.simonchila.halo.ui.screens.components.UnscBottomBar
 import com.simonchila.halo.ui.viewmodel.HaloViewModel
 
 @Composable
-fun HaloNavGraph(viewModel: HaloViewModel) {
+fun HaloNavGraph(
+    viewModel: HaloViewModel,
+    imageLoader: ImageLoader // Add this parameter
+) {
     val navController = rememberNavController()
     val statsList by viewModel.playerStats.collectAsStateWithLifecycle()
 
     Scaffold(
-        bottomBar = { UnscBottomBar(
-            navController,
-            getIconForRoute = { route -> getIconForRoute(route) }
-        ) }
+        bottomBar = {
+            UnscBottomBar(
+                navController,
+                getIconForRoute = { route -> getIconForRoute(route) }
+            )
+        }
     ) { padding ->
         NavHost(
             navController = navController,
@@ -45,23 +51,24 @@ fun HaloNavGraph(viewModel: HaloViewModel) {
             composable("home") {
                 HaloDashboard(
                     viewModel = viewModel,
+                    imageLoader = imageLoader, // Pass it down here
                     onPlayerClick = { tag ->
                         navController.navigate("detail/$tag")
                     }
                 )
             }
 
-            // INTEL (Match History - Image 3/5)
+            // INTEL (Match History)
             composable("intel") {
                 IntelScreen(viewModel)
             }
 
-            // PROFILE (Progression - Image 4)
+            // PROFILE (Progression)
             composable("profile") {
                 ProfileScreen(viewModel)
             }
 
-            // SETTINGS (Terminal Config - Image 6)
+            // SETTINGS
             composable("settings") {
                 SettingsScreen()
             }
@@ -72,9 +79,14 @@ fun HaloNavGraph(viewModel: HaloViewModel) {
                 arguments = listOf(navArgument("tag") { type = NavType.StringType })
             ) { backStackEntry ->
                 val tag = backStackEntry.arguments?.getString("tag")
-                val player = statsList.find { it.gamerTag == tag }
+                val player = statsList.find { it.gamerTag.equals(tag, ignoreCase = true) }
+
                 player?.let {
-                    PlayerDetailScreen(stats = it, onBack = { navController.popBackStack() })
+                    PlayerDetailScreen(
+                        stats = it,
+                        imageLoader = imageLoader, // Also pass it here for the detail view
+                        onBack = { navController.popBackStack() }
+                    )
                 }
             }
         }
@@ -85,7 +97,7 @@ fun getIconForRoute(route: String?): ImageVector {
     return when (route) {
         "home" -> Icons.Default.Home
         "profile" -> Icons.Default.AccountCircle
-        "intel" -> Icons.Default.Assessment // Looks like a tactical graph/chart
+        "intel" -> Icons.Default.Assessment
         "settings" -> Icons.Default.Settings
         else -> Icons.Default.Home
     }

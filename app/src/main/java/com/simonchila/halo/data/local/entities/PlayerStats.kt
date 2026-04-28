@@ -9,6 +9,8 @@ data class PlayerStats(
     val rank: String,
     val kills: Int,
     val deaths: Int,
-    val wins: Int,   // New
-    val losses: Int  // New
+    val wins: Int,
+    val losses: Int,
+    val imageUrl: String? = null,
+    val serviceTag: String = "UNKN"
 )

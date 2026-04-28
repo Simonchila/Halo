@@ -21,17 +21,32 @@ class HaloRepository(
         withContext(Dispatchers.IO) {
             try {
                 val response = apiService.getStats(gamerTag)
-                Log.d("API", response.toString())
+                Log.d("HaloRepository", "Uplink Status: ${response.code()}")
+
                 if (response.isSuccessful) {
                     val dto = response.body()
-                    // Convert DTOs to Entities and save to Room
-                    dto?.results?.map { it.toEntity() }?.forEach { entity ->
-                        haloDao.savePlayerStats(entity)
+
+                    // Debug log the raw body to see the structure in Logcat
+                    Log.d("HaloRepository", "Raw DTO: $dto")
+
+                    // If results is null, it's likely a single-player response
+                    // We handle both possibilities here
+                    val entitiesToSave = dto?.results?.map { it.toEntity() }
+                        ?: listOfNotNull(dto?.toEntity()) // Fallback to mapping the root object
+
+                    if (entitiesToSave.isNotEmpty()) {
+                        entitiesToSave.forEach { entity ->
+                            haloDao.savePlayerStats(entity)
+                            Log.d("HaloRepository", "Successfully stored: ${entity.gamerTag}")
+                        }
+                    } else {
+                        Log.w("HaloRepository", "Uplink successful, but no tactical data parsed.")
                     }
+                } else {
+                    Log.e("HaloRepository", "Uplink Denied: ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
-                // Log error - the UI will still show the old data from Room!
-                Log.e("HaloRepository", "Log error - the UI will still show the old data from Room!")
+                Log.e("HaloRepository", "COMMS_BREAKDOWN: ${e.message}", e)
             }
         }
     }

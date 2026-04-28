@@ -17,7 +17,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +27,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.ImageLoader
 import com.simonchila.halo.data.local.entities.PlayerStats
 import com.simonchila.halo.ui.screens.components.TacticalBox
 import com.simonchila.halo.ui.theme.UnscBlueDark
@@ -36,7 +36,7 @@ import com.simonchila.halo.ui.theme.UnscTextGray
 import com.simonchila.halo.ui.theme.unscGridBackground
 
 @Composable
-fun PlayerDetailScreen(stats: PlayerStats, onBack: () -> Unit) {
+fun PlayerDetailScreen(stats: PlayerStats, onBack: () -> Unit, imageLoader: ImageLoader) {
     Column(
         modifier = Modifier
             .fillMaxSize()

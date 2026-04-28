@@ -22,8 +22,8 @@ class MainActivity : ComponentActivity() {
 
         // 1. Initialize DB and API
         val database = HaloDatabase.getDatabase(this)
-       //val apiService = RetrofitClient.createService(BuildConfig.API_KEY)
         val apiService = RetrofitClient.createService()
+        val imageLoader = RetrofitClient.createImageLoader(this)
 
         // 2. Initialize Repository
         val repository = HaloRepository(apiService, database.haloDao())
@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             HaloTheme {
                 Surface(color = MaterialTheme.colorScheme.background) {
-                    HaloNavGraph(viewModel = viewModel)
+                    HaloNavGraph(viewModel = viewModel, imageLoader = imageLoader)
                 }
             }
         }

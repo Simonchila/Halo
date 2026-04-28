@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 interface HaloDao {
 
     // Observes a single player by their tag
-    @Query("SELECT * FROM player_stats WHERE gamerTag = :tag")
+    @Query("SELECT * FROM player_stats WHERE gamerTag LIKE :tag")
     fun getPlayerStats(tag: String): Flow<PlayerStats?>
 
     // Observes the entire history of players you've searched for
